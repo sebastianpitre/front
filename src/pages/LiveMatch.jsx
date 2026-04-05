@@ -302,6 +302,22 @@ export default function LiveMatch() {
   const localName = match?.team_local?.name ?? "Team A"
   const visitorName = match?.team_visitor?.name ?? "Team B"
 
+  const matchHeading =
+    match?.title?.trim() ||
+    (matchId ? `Partido #${matchId}` : "Partido")
+  const matchWhen = match?.scheduled_at
+    ? (() => {
+        try {
+          return new Date(match.scheduled_at).toLocaleString(undefined, {
+            dateStyle: "full",
+            timeStyle: "short",
+          })
+        } catch {
+          return match.scheduled_at
+        }
+      })()
+    : null
+
   const cardsSummary = useMemo(() => {
     const y = { local: 0, visitor: 0 }
     const r = { local: 0, visitor: 0 }
@@ -325,7 +341,10 @@ export default function LiveMatch() {
       <p className="breadcrumb">
         <Link to="/matches">← Matches</Link>
       </p>
-      <h1>Live match #{matchId}</h1>
+      <h1>{matchHeading}</h1>
+      {matchWhen ? (
+        <p className="page-lead muted">{matchWhen}</p>
+      ) : null}
 
       {error ? <p className="msg msg-error">{error}</p> : null}
 

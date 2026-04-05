@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react"
 import api from "../services/api.js"
+import Modal from "../components/Modal.jsx"
 
 const PLACEHOLDER =
   "data:image/svg+xml," +
@@ -19,6 +20,10 @@ export default function Players() {
   const [teamId, setTeamId] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(true)
+  const [editing, setEditing] = useState(null)
+  const [editName, setEditName] = useState("")
+  const [editPhotoUrl, setEditPhotoUrl] = useState("")
+  const [editTeamId, setEditTeamId] = useState("")
 
   const loadTeams = useCallback(async () => {
     const { data } = await api.get("/teams")
@@ -60,6 +65,51 @@ export default function Players() {
     loadPlayers()
   }, [loadPlayers])
 
+  function openEdit(p) {
+    setEditing(p)
+    setEditName(p.name)
+    setEditPhotoUrl(p.photo_url || "")
+    setEditTeamId(String(p.team_id))
+  }
+
+  async function handleSaveEdit(e) {
+    e.preventDefault()
+    if (!editing) return
+    setError("")
+    try {
+      const body = {
+        name: editName.trim(),
+        team_id: Number(editTeamId),
+      }
+      body.photo_url = editPhotoUrl.trim() || null
+      await api.patch(`/players/${editing.id}`, body)
+      setEditing(null)
+      await loadPlayers()
+    } catch (err) {
+      setError(
+        err.response?.data?.error || err.message || "No se pudo guardar el jugador"
+      )
+    }
+  }
+
+  async function handleDelete(p) {
+    if (
+      !window.confirm(
+        `¿Eliminar a «${p.name}»? Se quitará de alineaciones y eventos.`
+      )
+    )
+      return
+    setError("")
+    try {
+      await api.delete(`/players/${p.id}`)
+      await loadPlayers()
+    } catch (err) {
+      setError(
+        err.response?.data?.error || err.message || "No se pudo eliminar"
+      )
+    }
+  }
+
   async function handleCreate(e) {
     e.preventDefault()
     setError("")
@@ -87,6 +137,60 @@ export default function Players() {
   return (
     <div className="page">
       <h1>Players</h1>
+
+      <Modal
+        open={Boolean(editing)}
+        title={editing ? `Editar: ${editing.name}` : ""}
+        onClose={() => setEditing(null)}
+      >
+        {editing ? (
+          <form className="form-stack" onSubmit={handleSaveEdit}>
+            <label className="field-label">
+              Nombre
+              <input
+                className="field-control"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+              />
+            </label>
+            <label className="field-label">
+              Foto (URL)
+              <input
+                className="field-control"
+                value={editPhotoUrl}
+                onChange={(e) => setEditPhotoUrl(e.target.value)}
+                placeholder="https://…"
+              />
+            </label>
+            <label className="field-label">
+              Equipo
+              <select
+                className="field-control"
+                value={editTeamId}
+                onChange={(e) => setEditTeamId(e.target.value)}
+              >
+                {teams.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div className="form-row">
+              <button type="submit" className="btn btn-primary">
+                Guardar
+              </button>
+              <button
+                type="button"
+                className="btn"
+                onClick={() => setEditing(null)}
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        ) : null}
+      </Modal>
 
       <section className="panel">
         <h2 className="panel-title">Filter by team</h2>
@@ -151,30 +255,42 @@ export default function Players() {
         <h2 className="panel-title">Roster</h2>
 
         <div className="row">
-            {players.map((p) => (
-          <div className="col-4">
-
-            <dic key={p.id} className="card m-1 p-3 text-center bg-dark panel">
-              <img
-                className="player-list-photo "
-                src={p.photo_url?.trim() ? p.photo_url : PLACEHOLDER}
-                alt=""
-                onError={(e) => {
-                  e.currentTarget.src = PLACEHOLDER
-                }}
-              />
-              <div className="player-list-text">
-                <strong>{p.name}</strong>
-                <span className="muted">team #{p.team_id}</span>
+          {players.map((p) => (
+            <div key={p.id} className="col-4">
+              <div className="card m-1 p-3 text-center bg-dark panel player-card-tile">
+                <img
+                  className="player-list-photo "
+                  src={p.photo_url?.trim() ? p.photo_url : PLACEHOLDER}
+                  alt=""
+                  onError={(e) => {
+                    e.currentTarget.src = PLACEHOLDER
+                  }}
+                />
+                <div className="player-list-text">
+                  <strong>{p.name}</strong>
+                  <span className="muted">team #{p.team_id}</span>
+                </div>
+                <div className="table-actions player-card-actions">
+                  <button
+                    type="button"
+                    className="btn btn-small"
+                    onClick={() => openEdit(p)}
+                  >
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-small"
+                    onClick={() => handleDelete(p)}
+                  >
+                    Borrar
+                  </button>
+                </div>
               </div>
-            </dic>
-        </div>
-
+            </div>
           ))}
         </div>
-        <ul className="player-list">
-          
-        </ul>
+        <ul className="player-list" />
         {!loading && players.length === 0 ? (
           <p className="muted">No players yet.</p>
         ) : null}

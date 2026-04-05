@@ -2,6 +2,22 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import api from "../services/api.js"
 import MatchCard from "../components/MatchCard.jsx"
+import Modal from "../components/Modal.jsx"
+
+function scheduledLocalToIso(localStr) {
+  if (!localStr?.trim()) return null
+  const d = new Date(localStr)
+  if (Number.isNaN(d.getTime())) return null
+  return d.toISOString()
+}
+
+function isoToDatetimeLocal(iso) {
+  if (!iso) return ""
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return ""
+  const pad = (n) => String(n).padStart(2, "0")
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
 
 const PITCH_POSITIONS = [
   { value: "GK", label: "Portero" },
@@ -39,6 +55,11 @@ export default function Matches() {
   const [draft, setDraft] = useState({})
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(true)
+  const [matchTitle, setMatchTitle] = useState("")
+  const [matchScheduledLocal, setMatchScheduledLocal] = useState("")
+  const [editingMatch, setEditingMatch] = useState(null)
+  const [editTitle, setEditTitle] = useState("")
+  const [editScheduledLocal, setEditScheduledLocal] = useState("")
 
   const loadMatches = useCallback(async () => {
     setError("")
@@ -208,12 +229,19 @@ export default function Matches() {
     }
 
     try {
-      // 1) Crear partido. 2) Alineación vía POST /lineup (persistencia fiable en BD).
-      const { data: created } = await api.post("/matches", {
+      const scheduledIso = scheduledLocalToIso(matchScheduledLocal)
+      const body = {
         team_local_id: lid,
         team_visitor_id: vid,
-      })
+      }
+      const t = matchTitle.trim()
+      if (t) body.title = t
+      if (scheduledIso) body.scheduled_at = scheduledIso
+      // 1) Crear partido. 2) Alineación vía POST /lineup (persistencia fiable en BD).
+      const { data: created } = await api.post("/matches", body)
       await api.post(`/matches/${created.id}/lineup`, { entries })
+      setMatchTitle("")
+      setMatchScheduledLocal("")
       await loadMatches()
     } catch (err) {
       setError(
@@ -304,13 +332,121 @@ export default function Matches() {
     )
   }
 
+  function openEditMatch(m) {
+    setEditingMatch(m)
+    setEditTitle(m.title || "")
+    setEditScheduledLocal(isoToDatetimeLocal(m.scheduled_at))
+  }
+
+  async function handleSaveMatchEdit(e) {
+    e.preventDefault()
+    if (!editingMatch) return
+    setError("")
+    try {
+      const scheduledIso = scheduledLocalToIso(editScheduledLocal)
+      await api.patch(`/matches/${editingMatch.id}`, {
+        title: editTitle.trim() || null,
+        scheduled_at: scheduledIso,
+      })
+      setEditingMatch(null)
+      await loadMatches()
+    } catch (err) {
+      setError(
+        err.response?.data?.error || err.message || "No se pudo actualizar"
+      )
+    }
+  }
+
+  async function handleDeleteMatch(m) {
+    if (
+      !window.confirm(
+        `¿Eliminar «${m.title?.trim() || `partido #${m.id}`}»? Se borrarán eventos y alineación.`
+      )
+    )
+      return
+    setError("")
+    try {
+      await api.delete(`/matches/${m.id}`)
+      if (editingMatch?.id === m.id) setEditingMatch(null)
+      await loadMatches()
+    } catch (err) {
+      setError(
+        err.response?.data?.error || err.message || "No se pudo eliminar"
+      )
+    }
+  }
+
   return (
     <div className="page">
       <h1>Partidos</h1>
 
+      <Modal
+        open={Boolean(editingMatch)}
+        title={editingMatch ? "Editar partido" : ""}
+        onClose={() => setEditingMatch(null)}
+      >
+        {editingMatch ? (
+          <form className="form-stack" onSubmit={handleSaveMatchEdit}>
+            <label className="field-label">
+              Nombre del partido
+              <input
+                className="field-control"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                placeholder="Ej. Semifinal A"
+              />
+            </label>
+            <label className="field-label">
+              Día y hora
+              <input
+                className="field-control"
+                type="datetime-local"
+                value={editScheduledLocal}
+                onChange={(e) => setEditScheduledLocal(e.target.value)}
+              />
+            </label>
+            <p className="muted small">
+              Deja la fecha vacía para quitar la hora programada.
+            </p>
+            <div className="form-row">
+              <button type="submit" className="btn btn-primary">
+                Guardar
+              </button>
+              <button
+                type="button"
+                className="btn"
+                onClick={() => setEditingMatch(null)}
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        ) : null}
+      </Modal>
+
       <section className="panel">
         <h2 className="panel-title">Nuevo partido</h2>
         <form onSubmit={handleCreate}>
+          <div className="form-row form-row--wrap">
+            <label className="field-label">
+              Nombre del partido (opcional)
+              <input
+                className="field-control"
+                value={matchTitle}
+                onChange={(e) => setMatchTitle(e.target.value)}
+                placeholder="Ej. Final categoría B"
+              />
+            </label>
+            <label className="field-label">
+              Día y hora (opcional)
+              <input
+                className="field-control"
+                type="datetime-local"
+                value={matchScheduledLocal}
+                onChange={(e) => setMatchScheduledLocal(e.target.value)}
+              />
+            </label>
+          </div>
           <div className="form-row form-row--wrap">
             <label className="field-label">
               Equipo local
@@ -392,6 +528,8 @@ export default function Matches() {
               key={m.id}
               match={m}
               onOpenMatch={(id) => navigate(`/match/${id}`)}
+              onEdit={openEditMatch}
+              onDelete={handleDeleteMatch}
             />
           ))}
         </div>

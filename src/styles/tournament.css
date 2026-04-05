@@ -178,10 +178,72 @@
   color: var(--accent);
 }
 
+.main-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .main-nav {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem 1rem;
+}
+
+.btn-small {
+  font-size: 0.875rem;
+  padding: 0.35rem 0.65rem;
+}
+
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 65svh;
+}
+
+.login-panel {
+  max-width: 24rem;
+  width: 100%;
+}
+
+.login-title {
+  text-align: center;
+  margin-top: 0;
+}
+
+.table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.player-card-actions {
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.match-card-title-row {
+  margin-bottom: 0.35rem;
+}
+
+.match-card-heading {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.match-card-when {
+  display: block;
+  margin-top: 0.15rem;
+}
+
+.match-card-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
 }
 
 .main-nav a {
