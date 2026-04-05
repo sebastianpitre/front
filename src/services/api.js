@@ -6,7 +6,7 @@ import { AUTH_DISABLED, TOKEN_STORAGE_KEY } from "../config.js"
  * All paths are relative to the base URL (e.g. get("/teams")).
  */
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000",
+  baseURL: import.meta.env.VITE_API_URL || "https://intercursos.ocloudev.lat",
   headers: {
     "Content-Type": "application/json",
   },
