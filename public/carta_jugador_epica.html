@@ -1,0 +1,324 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@600;700&display=swap');
+
+  .card-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    min-height: 700px;
+  }
+
+  .player-card {
+    position: relative;
+    width: 300px;
+    height: 440px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 0 60px rgba(255,200,0,0.4), 0 0 120px rgba(255,160,0,0.2);
+    font-family: 'Rajdhani', sans-serif;
+  }
+
+  .card-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(155deg, #1a0a00 0%, #3d1800 25%, #6b2e00 45%, #8b4500 55%, #3d1800 75%, #1a0a00 100%);
+  }
+
+  .card-shine {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,215,0,0.15) 0%, transparent 40%, rgba(255,160,0,0.1) 60%, transparent 80%);
+  }
+
+  .card-border {
+    position: absolute;
+    inset: 3px;
+    border-radius: 17px;
+    border: 1.5px solid rgba(255,200,50,0.5);
+    background: linear-gradient(160deg, rgba(255,200,0,0.08) 0%, transparent 50%, rgba(255,180,0,0.05) 100%);
+  }
+
+  .card-top {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 14px 18px 0;
+  }
+
+  .rating-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+  }
+
+  .rating-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    color: #FFD700;
+    text-shadow: 0 0 20px rgba(255,215,0,0.8), 0 2px 4px rgba(0,0,0,0.8);
+    letter-spacing: -1px;
+  }
+
+  .position-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    color: #FFD700;
+    text-shadow: 0 0 10px rgba(255,215,0,0.6);
+    margin-top: -4px;
+  }
+
+  .flag-nation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .flag-img {
+    width: 36px;
+    height: 24px;
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid rgba(255,200,0,0.4);
+    background: linear-gradient(180deg, #FCD116 33%, #003087 33% 66%, #CE1126 66%);
+  }
+
+  .club-badge {
+    width: 34px;
+    height: 34px;
+  }
+
+  .photo-container {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    margin-top: -8px;
+  }
+
+  .photo-frame {
+    position: relative;
+    width: 210px;
+    height: 190px;
+    overflow: hidden;
+  }
+
+  .photo-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    filter: contrast(1.05) saturate(1.1);
+  }
+
+  .photo-glow {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(to top, #3d1800 0%, transparent 100%);
+  }
+
+  .player-name-wrapper {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 2px 12px 4px;
+  }
+
+  .player-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 34px;
+    color: #FFD700;
+    letter-spacing: 3px;
+    text-shadow: 0 0 20px rgba(255,215,0,0.7), 0 2px 6px rgba(0,0,0,0.9);
+    line-height: 1;
+  }
+
+  .divider {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 20px;
+    margin: 4px 0;
+  }
+
+  .divider-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255,200,0,0.6), transparent);
+  }
+
+  .divider-diamond {
+    width: 6px;
+    height: 6px;
+    background: #FFD700;
+    transform: rotate(45deg);
+    box-shadow: 0 0 6px rgba(255,215,0,0.8);
+  }
+
+  .stats-grid {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    padding: 6px 16px 12px;
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4px 0;
+  }
+
+  .stat-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    color: #FFD700;
+    line-height: 1;
+    text-shadow: 0 0 10px rgba(255,215,0,0.5);
+  }
+
+  .stat-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255,220,100,0.7);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .card-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    height: 6px;
+    background: linear-gradient(to right, transparent, rgba(255,200,0,0.4), rgba(255,215,0,0.8), rgba(255,200,0,0.4), transparent);
+  }
+
+  .stars-row {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: #FFD700;
+    font-size: 14px;
+    letter-spacing: 4px;
+    text-shadow: 0 0 8px rgba(255,215,0,0.7);
+    margin-top: -2px;
+    margin-bottom: 2px;
+  }
+
+  .card-type-badge {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    background: linear-gradient(135deg, #8B6914, #FFD700, #8B6914);
+    border-radius: 4px;
+    padding: 2px 10px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #1a0a00;
+    box-shadow: 0 0 10px rgba(255,215,0,0.5);
+  }
+
+  .corner-ornament {
+    position: absolute;
+    z-index: 3;
+    width: 20px;
+    height: 20px;
+  }
+  .corner-ornament.tl { top: 8px; left: 8px; border-top: 2px solid rgba(255,200,0,0.6); border-left: 2px solid rgba(255,200,0,0.6); border-radius: 3px 0 0 0; }
+  .corner-ornament.tr { top: 8px; right: 8px; border-top: 2px solid rgba(255,200,0,0.6); border-right: 2px solid rgba(255,200,0,0.6); border-radius: 0 3px 0 0; }
+  .corner-ornament.bl { bottom: 8px; left: 8px; border-bottom: 2px solid rgba(255,200,0,0.6); border-left: 2px solid rgba(255,200,0,0.6); border-radius: 0 0 0 3px; }
+  .corner-ornament.br { bottom: 8px; right: 8px; border-bottom: 2px solid rgba(255,200,0,0.6); border-right: 2px solid rgba(255,200,0,0.6); border-radius: 0 0 3px 0; }
+</style>
+
+<div class="card-wrapper">
+  <div class="player-card">
+    <div class="card-bg"></div>
+    <div class="card-shine"></div>
+    <div class="card-border"></div>
+    <div class="corner-ornament tl"></div>
+    <div class="corner-ornament tr"></div>
+    <div class="corner-ornament bl"></div>
+    <div class="corner-ornament br"></div>
+
+    <div class="card-top">
+      <div class="rating-block">
+        <div class="rating-num">94</div>
+        <div class="position-label">ST</div>
+      </div>
+      <div class="flag-nation">
+        <div class="flag-img"></div>
+        <svg class="club-badge" viewBox="0 0 40 40">
+          <polygon points="20,2 38,12 38,28 20,38 2,28 2,12" fill="#4a0080" stroke="#FFD700" stroke-width="1.5"/>
+          <circle cx="20" cy="20" r="8" fill="none" stroke="#FFD700" stroke-width="1"/>
+          <text x="20" y="24" text-anchor="middle" font-size="9" fill="#FFD700" font-family="Bebas Neue, sans-serif">9</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="photo-container">
+      <div class="photo-frame">
+        <img src="/mnt/user-data/uploads/1775423255695_image.png" alt="player" />
+        <div class="photo-glow"></div>
+      </div>
+    </div>
+
+    <div class="player-name-wrapper">
+      <div class="player-name">JUGADOR #9</div>
+    </div>
+
+    <div class="stars-row">★ ★ ★ ★ ★</div>
+
+    <div class="divider">
+      <div class="divider-line"></div>
+      <div class="divider-diamond"></div>
+      <div class="divider-line"></div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-value">96</div>
+        <div class="stat-label">RIT</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">95</div>
+        <div class="stat-label">TIR</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">91</div>
+        <div class="stat-label">PAS</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">93</div>
+        <div class="stat-label">REG</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">88</div>
+        <div class="stat-label">DEF</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">92</div>
+        <div class="stat-label">FIS</div>
+      </div>
+    </div>
+
+    <div class="card-footer"></div>
+  </div>
+</div>

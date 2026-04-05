@@ -221,7 +221,7 @@ export default function Teams() {
 
       <section className="panel">
         <h2 className="panel-title">New team</h2>
-        <form className="form-row" onSubmit={handleCreate}>
+        <form className="form-row col" onSubmit={handleCreate}>
           <label className="field-label">
             Name
             <input
@@ -229,6 +229,7 @@ export default function Teams() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. 3º A"
+              style={{width:"auto"}}
             />
           </label>
           <label className="field-label">

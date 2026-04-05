@@ -24,6 +24,28 @@ export default function Players() {
   const [editName, setEditName] = useState("")
   const [editPhotoUrl, setEditPhotoUrl] = useState("")
   const [editTeamId, setEditTeamId] = useState("")
+const [openCreate, setOpenCreate] = useState(false)
+
+  const defaultPhotos = [
+  "https://publish.realmadrid.com/content/dam/portals/realmadrid-com/es-es/sports/football/3kq9cckrnlogidldtdie2fkbl/players/thibaut-courtois/assets/COURTOIS_550x650_SinParche.png",
+  "https://img.uefa.com/imgml/TP/players/1/2026/cutoff/97923.webp",
+  "https://static.wikia.nocookie.net/liverpoolfc/images/b/b8/VVD2025.jpeg/revision/latest?cb=20250807012037",
+  "https://img.uefa.com/imgml/TP/players/1/2026/cutoff/250058220.webp",
+  "https://static.wikia.nocookie.net/liverpoolfc/images/4/4b/TAA2024.png/revision/latest?cb=20240830094039",
+  "https://img.fcbayern.com/image/upload/f_auto/q_auto/t_cms-6x9-seo/v1656615722/cms/public/images/fcbayern-com/players/spielerportraits/ganzkoerper/alphonso_davies.png",
+  "https://img.uefa.com/imgml/TP/players/1/2026/cutoff/250082664.webp",
+  "https://img.uefa.com/imgml/TP/players/1/2026/cutoff/250181610.webp",
+  "https://publish.realmadrid.com/content/dam/portals/realmadrid-com/es-es/sports/football/3kq9cckrnlogidldtdie2fkbl/players/jude-bellingham/assets/BELLINGHAM_EQUIPO_CARITA_380x501_SinParche.png",
+  "https://crystalpng.com/wp-content/uploads/2025/02/Kevin-De-Bruyne-png-02.png",
+  "https://img.uefa.com/imgml/TP/players/1/2026/cutoff/250121533.webp",
+  "https://img.uefa.com/imgml/TP/players/1/2026/cutoff/250076574.webp",
+  "https://img.uefa.com/imgml/TP/players/1/2026/cutoff/250103758.webp",
+  "https://www.cariverplate.com.ar/imagenes/jugadores/2025-07/1640-653x667.png",
+  "https://png.pngtree.com/png-vector/20250728/ourmid/pngtree-messi-argentina-high-energy-action-dynamic-pose-vibrant-colors-intense-lighting-png-image_16885439.webp",
+  "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/acb5cb15-636b-4bd5-a06e-a62420c5fb7f/db6kv6o-ad89c20a-b626-416d-87be-84c50f504566.png/v1/fill/w_600,h_1170/cristiano_ronaldo_png_by_kooyooss_db6kv6o-fullview.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTE3MCIsInBhdGgiOiIvZi9hY2I1Y2IxNS02MzZiLTRiZDUtYTA2ZS1hNjI0MjBjNWZiN2YvZGI2a3Y2by1hZDg5YzIwYS1iNjI2LTQxNmQtODdiZS04NGM1MGY1MDQ1NjYucG5nIiwid2lkdGgiOiI8PTYwMCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.tLT1OITrSPU1NCOIX3lVapdHFwipIhrjVz3aiiixSBM",
+
+];
+
 
   const loadTeams = useCallback(async () => {
     const { data } = await api.get("/teams")
@@ -126,6 +148,7 @@ export default function Players() {
       await api.post("/players", body)
       setName("")
       setPhotoUrl("")
+      setOpenCreate(false)
       await loadPlayers()
     } catch (err) {
       setError(
@@ -198,6 +221,7 @@ export default function Players() {
           className="field-control field-control--inline"
           value={filterTeamId}
           onChange={(e) => setFilterTeamId(e.target.value)}
+          style={{MaxWidth:"10px"}}
         >
           <option value="">All teams</option>
           {teams.map((t) => (
@@ -207,9 +231,23 @@ export default function Players() {
           ))}
         </select>
       </section>
-
+      
       <section className="panel">
-        <h2 className="panel-title">New player</h2>
+        <h2 className="panel-title">Players</h2>
+
+        <button
+          className="btn btn-primary"
+          onClick={() => setOpenCreate(true)}
+        >
+          + New Player
+        </button>
+      </section>
+
+      <Modal
+        open={openCreate}
+        title="New Player"
+        onClose={() => setOpenCreate(false)}
+      >
         <form className="form-stack" onSubmit={handleCreate}>
           <label className="field-label">
             name
@@ -219,6 +257,7 @@ export default function Players() {
               onChange={(e) => setName(e.target.value)}
             />
           </label>
+
           <label className="field-label">
             photo_url
             <input
@@ -228,8 +267,22 @@ export default function Players() {
               placeholder="https://…"
             />
           </label>
+
+          <div className="players-grid">
+            {defaultPhotos.map((url) => (
+              <div className="player-box" key={url}>
+                <img
+                  src={url}
+                  alt=""
+                  className={`photo-option ${photoUrl === url ? "active" : ""}`}
+                  onClick={() => setPhotoUrl(url)}
+                />
+              </div>
+            ))}
+          </div>
+
           <label className="field-label">
-            team_id
+            team
             <select
               className="field-control"
               value={teamId}
@@ -237,16 +290,27 @@ export default function Players() {
             >
               {teams.map((t) => (
                 <option key={t.id} value={t.id}>
-                  {t.name} ({t.id})
+                  {t.name}
                 </option>
               ))}
             </select>
           </label>
-          <button type="submit" className="btn btn-primary">
-            Create
-          </button>
+
+          <div className="form-row">
+            <button type="submit" className="btn btn-primary">
+              Create
+            </button>
+
+            <button
+              type="button"
+              className="btn"
+              onClick={() => setOpenCreate(false)}
+            >
+              Cancel
+            </button>
+          </div>
         </form>
-      </section>
+      </Modal>
 
       {error ? <p className="msg msg-error">{error}</p> : null}
       {loading ? <p className="msg">Loading…</p> : null}
@@ -256,20 +320,25 @@ export default function Players() {
 
         <div className="row">
           {players.map((p) => (
-            <div key={p.id} className="col-4">
+            <div key={p.id} className="col-6 col-sm-4 col-md-4 col-lg-3">
               <div className="card m-1 p-3 text-center bg-dark panel player-card-tile">
-                <img
-                  className="player-list-photo "
-                  src={p.photo_url?.trim() ? p.photo_url : PLACEHOLDER}
-                  alt=""
-                  onError={(e) => {
-                    e.currentTarget.src = PLACEHOLDER
+                <div
+                  className="player-list-photo"
+                  style={{
+                    backgroundImage: `url(${p.photo_url?.trim() ? p.photo_url : PLACEHOLDER})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "top",
+                    backgroundRepeat: "no-repeat"
                   }}
                 />
+
                 <div className="player-list-text">
-                  <strong>{p.name}</strong>
-                  <span className="muted">team #{p.team_id}</span>
-                </div>
+                <strong>{p.name}</strong>
+                <span className="muted">
+                {teams.find(t => t.id === p.team_id)?.name || "Sin equipo"} 🚩
+                </span>
+              </div>
+
                 <div className="table-actions player-card-actions">
                   <button
                     type="button"
