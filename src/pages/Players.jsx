@@ -29,7 +29,7 @@ const [openCreate, setOpenCreate] = useState(false)
   const defaultPhotos = [
   "https://publish.realmadrid.com/content/dam/portals/realmadrid-com/es-es/sports/football/3kq9cckrnlogidldtdie2fkbl/players/thibaut-courtois/assets/COURTOIS_550x650_SinParche.png",
   "https://img.uefa.com/imgml/TP/players/1/2026/cutoff/97923.webp",
-  "https://static.wikia.nocookie.net/liverpoolfc/images/b/b8/VVD2025.jpeg/revision/latest?cb=20250807012037",
+  "https://backend.liverpoolfc.com/sites/default/files/styles/lg/public/2025-08/virgil-van-dijk-2526-bodyshot_eb62918c7334e39f7ba555d572aa7975.png?itok=gxhxmIe8",
   "https://img.uefa.com/imgml/TP/players/1/2026/cutoff/250058220.webp",
   "https://static.wikia.nocookie.net/liverpoolfc/images/4/4b/TAA2024.png/revision/latest?cb=20240830094039",
   "https://img.fcbayern.com/image/upload/f_auto/q_auto/t_cms-6x9-seo/v1656615722/cms/public/images/fcbayern-com/players/spielerportraits/ganzkoerper/alphonso_davies.png",

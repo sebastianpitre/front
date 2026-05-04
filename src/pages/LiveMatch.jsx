@@ -4,6 +4,8 @@ import api from "../services/api.js"
 import Modal from "../components/Modal.jsx"
 import PlayerButton from "../components/PlayerButton.jsx"
 import Scoreboard from "../components/Scoreboard.jsx"
+import ScoreboardMini from "../components/ScoreboardMini.jsx"
+import "./LiveMatch.css"
 import {
   normalizePitchSlot,
   SLOT_STYLE_LOCAL,
@@ -407,6 +409,17 @@ export default function LiveMatch() {
 
           <div className="pitch" aria-label="Campo de fútbol">
             <div className="pitch-half-line" />
+            <div className="pitch-half-centro" />
+
+            <div className="" style={{position:"absolute", top:"10px", width:"300px", left:"10px"}}>
+              <ScoreboardMini
+                teamLocalName={localName}
+                teamVisitorName={visitorName}
+                goalsLocal={match.goals_local}
+                goalsVisitor={match.goals_visitor}
+              />
+            </div>
+
             <div className="pitch-arc-local" />
             {!matchLocked ? (
 
